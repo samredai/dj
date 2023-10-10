@@ -16,14 +16,12 @@ from djqs import __version__
 from djqs.api import catalogs, engines, queries, tables
 from djqs.config import load_djqs_config
 from djqs.exceptions import DJException
-from djqs.utils import get_session, get_settings
+from djqs.utils import get_settings
 
 _logger = logging.getLogger(__name__)
 
 settings = get_settings()
-if settings.configuration_file:
-    session = next(get_session())
-    load_djqs_config(config_file=settings.configuration_file, session=session)
+load_djqs_config()
 
 app = FastAPI(
     title=settings.name,

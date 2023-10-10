@@ -22,7 +22,15 @@ post_router = APIRouter(tags=["Catalogs & Engines - Dynamic Configuration"])
 
 
 @get_router.get("/catalogs/", response_model=List[CatalogInfo])
-def list_catalogs(
+def list_catalogs(*, session: Session = Depends(get_session)) -> List[CatalogInfo]:
+    """
+    List all available catalogs
+    """
+    return list(session.exec(select(Catalog)))
+
+
+@get_router.get("/catalogs/", response_model=List[CatalogInfo])
+def list_catalogs_no_config_file(
     *, settings_no_config_file: Session = Depends(get_session)
 ) -> List[CatalogInfo]:
     """

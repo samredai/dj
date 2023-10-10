@@ -9,10 +9,11 @@ import yaml
 from cachelib.base import BaseCache
 from cachelib.file import FileSystemCache
 from pydantic import BaseSettings
-from sqlmodel import Session, delete, select
+from sqlmodel import delete, select
 
 from djqs.models.catalog import Catalog, CatalogEngines
 from djqs.models.engine import Engine
+from djqs.utils import get_session, get_settings
 
 
 class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
@@ -48,10 +49,16 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
     enable_dynamic_config: bool = True
 
 
-def load_djqs_config(config_file: str, session: Session) -> None:  # pragma: no cover
+def load_djqs_config() -> None:  # pragma: no cover
     """
     Load the DJQS config file into the server metadata database
     """
+    settings = get_settings()
+    config_file = settings.configuration_file if settings.configuration_file else None
+    if not config_file:
+        return
+
+    session = next(get_session())
     session.exec(delete(Catalog))
     session.exec(delete(Engine))
     session.exec(delete(CatalogEngines))

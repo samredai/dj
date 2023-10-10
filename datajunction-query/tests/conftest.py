@@ -93,6 +93,30 @@ def client(session: Session, settings: Settings) -> Iterator[TestClient]:
     app.dependency_overrides.clear()
 
 
+@pytest.fixture()
+def client_no_config_file(
+    session: Session,
+    settings_no_config_file: Settings,
+) -> Iterator[TestClient]:
+    """
+    Create a client for testing APIs.
+    """
+
+    def get_session_override() -> Session:
+        return session
+
+    def get_settings_override() -> Settings:
+        return settings_no_config_file
+
+    app.dependency_overrides[get_session] = get_session_override
+    app.dependency_overrides[get_settings] = get_settings_override
+
+    with TestClient(app) as client:
+        yield client
+
+    app.dependency_overrides.clear()
+
+
 @pytest.fixture(scope="session")
 def duckdb_conn():
     """
