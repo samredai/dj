@@ -38,6 +38,24 @@ def settings(mocker: MockerFixture) -> Iterator[Settings]:
     yield settings
 
 
+@pytest.fixture
+def settings_no_config_file(mocker: MockerFixture) -> Iterator[Settings]:
+    """
+    Custom settings for unit tests.
+    """
+    settings = Settings(
+        index="sqlite://",
+        results_backend=SimpleCache(default_timeout=0),
+    )
+
+    mocker.patch(
+        "djqs.utils.get_settings",
+        return_value=settings,
+    )
+
+    yield settings
+
+
 @pytest.fixture()
 def session() -> Iterator[Session]:
     """
