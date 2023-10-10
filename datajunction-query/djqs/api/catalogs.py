@@ -29,16 +29,6 @@ def list_catalogs(*, session: Session = Depends(get_session)) -> List[CatalogInf
     return list(session.exec(select(Catalog)))
 
 
-@get_router.get("/catalogs/", response_model=List[CatalogInfo])
-def list_catalogs_no_config_file(
-    *, settings_no_config_file: Session = Depends(get_session)
-) -> List[CatalogInfo]:
-    """
-    List all available catalogs
-    """
-    return list(settings_no_config_file.exec(select(Catalog)))
-
-
 @get_router.get("/catalogs/{name}/", response_model=CatalogInfo)
 def read_catalog(name: str, *, session: Session = Depends(get_session)) -> CatalogInfo:
     """
