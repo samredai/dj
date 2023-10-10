@@ -58,7 +58,6 @@ def load_djqs_config(session: Session) -> None:  # pragma: no cover
     if not config_file:
         return
 
-    session = next(get_session())
     session.exec(delete(Catalog))
     session.exec(delete(Engine))
     session.exec(delete(CatalogEngines))
