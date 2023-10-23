@@ -58,8 +58,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 _logger = logging.getLogger(__name__)
 settings = get_settings()
-if not settings.secret:  # pragma: no cover
-    raise DJException("A 128 bit secret key must be set in the server configuration")
 
 config.fileConfig(
     path.join(path.dirname(path.abspath(__file__)), "logging.conf"),
