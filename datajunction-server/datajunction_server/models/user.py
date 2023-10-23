@@ -2,10 +2,13 @@
 Models for users and auth
 """
 from enum import Enum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
+
+if TYPE_CHECKING:
+    from datajunction_server.models.node import Node, NodeNamespace
 
 
 class OAuthProvider(Enum):

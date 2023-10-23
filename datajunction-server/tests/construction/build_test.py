@@ -15,6 +15,7 @@ from datajunction_server.models import (
     NodeRevision,
 )
 from datajunction_server.models.node import Node, NodeType
+from datajunction_server.models.user import User
 from datajunction_server.utils import amenable_name
 
 from ..sql.utils import compare_query_strings
@@ -126,7 +127,10 @@ def test_build_metric_with_required_dimensions(request):
 
 
 @pytest.mark.asyncio
-async def test_raise_on_build_without_required_dimension_column(request):
+async def test_raise_on_build_without_required_dimension_column(
+    request,
+    mock_user_dj: User,
+):
     """
     Test building a node that has a dimension reference without a column and a compound PK
     """
@@ -140,6 +144,7 @@ async def test_raise_on_build_without_required_dimension_column(request):
         name="basic.dimension.compound_countries",
         type=NodeType.DIMENSION,
         current_version="1",
+        created_by=mock_user_dj.id,
     )
     NodeRevision(
         name=countries_dim_ref.name,
@@ -167,7 +172,12 @@ async def test_raise_on_build_without_required_dimension_column(request):
             Column(name="user_cnt", type=ct.IntegerType()),
         ],
     )
-    node_foo_ref = Node(name="basic.foo", type=NodeType.TRANSFORM, current_version="1")
+    node_foo_ref = Node(
+        name="basic.foo",
+        type=NodeType.TRANSFORM,
+        current_version="1",
+        created_by=mock_user_dj.id,
+    )
     node_foo = NodeRevision(
         name=node_foo_ref.name,
         type=node_foo_ref.type,
@@ -189,7 +199,12 @@ async def test_raise_on_build_without_required_dimension_column(request):
     construction_session.add(node_foo)
     construction_session.flush()
 
-    node_bar_ref = Node(name="basic.bar", type=NodeType.TRANSFORM, current_version="1")
+    node_bar_ref = Node(
+        name="basic.bar",
+        type=NodeType.TRANSFORM,
+        current_version="1",
+        created_by=mock_user_dj.id,
+    )
     node_bar = NodeRevision(
         name=node_bar_ref.name,
         type=node_bar_ref.type,

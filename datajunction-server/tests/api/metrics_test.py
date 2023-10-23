@@ -10,6 +10,7 @@ from datajunction_server.models.column import Column
 from datajunction_server.models.database import Database
 from datajunction_server.models.node import Node, NodeRevision, NodeType
 from datajunction_server.models.table import Table
+from datajunction_server.models.user import User
 from datajunction_server.sql.parsing.types import FloatType, IntegerType, StringType
 
 
@@ -24,7 +25,7 @@ def test_read_metrics(client_with_roads: TestClient) -> None:
     assert len(data) > 5
 
 
-def test_read_metric(session: Session, client: TestClient) -> None:
+def test_read_metric(session: Session, client: TestClient, mock_user_dj: User) -> None:
     """
     Test ``GET /metric/{node_id}/``.
     """
@@ -69,6 +70,7 @@ def test_read_metric(session: Session, client: TestClient) -> None:
         namespace="default",
         type=NodeType.SOURCE,
         current_version="1",
+        created_by=mock_user_dj.id,
     )
     parent_rev.node = parent_node
 
@@ -77,6 +79,7 @@ def test_read_metric(session: Session, client: TestClient) -> None:
         namespace="default",
         type=NodeType.METRIC,
         current_version="1",
+        created_by=mock_user_dj.id,
     )
     child_rev = NodeRevision(
         name=child_node.name,
@@ -102,7 +105,11 @@ def test_read_metric(session: Session, client: TestClient) -> None:
     ]
 
 
-def test_read_metrics_errors(session: Session, client: TestClient) -> None:
+def test_read_metrics_errors(
+    session: Session,
+    client: TestClient,
+    mock_user_dj: User,
+) -> None:
     """
     Test errors on ``GET /metrics/{node_id}/``.
     """
@@ -112,6 +119,7 @@ def test_read_metrics_errors(session: Session, client: TestClient) -> None:
         namespace="default",
         type=NodeType.TRANSFORM,
         current_version="1",
+        created_by=mock_user_dj.id,
     )
     node_revision = NodeRevision(
         name=node.name,

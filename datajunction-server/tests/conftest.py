@@ -41,6 +41,26 @@ EXAMPLE_TOKEN = (
 )
 
 
+@pytest.fixture(scope="session", autouse=True)
+def mock_user_dj() -> User:
+    """
+    Mock a DJ user for tests
+    """
+    return User(id=1, username="dj", oauth_provider=OAuthProvider.BASIC)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def default_session_fixture(mock_user_dj: User) -> Iterator[None]:
+    """
+    Global patches to include with the default session
+    """
+    with patch(
+        "datajunction_server.internal.access.authentication.http.get_user",
+        return_value=mock_user_dj,
+    ):
+        yield
+
+
 @pytest.fixture
 def settings(mocker: MockerFixture) -> Iterator[Settings]:
     """
@@ -463,15 +483,3 @@ def pytest_addoption(parser):
         default=False,
         help="Run authentication tests",
     )
-
-
-@pytest.fixture(scope="session", autouse=True)
-def mock_user_dj() -> Iterator[None]:
-    """
-    Mock a DJ user for tests
-    """
-    with patch(
-        "datajunction_server.internal.access.authentication.http.get_user",
-        return_value=User(id=1, username="dj", oauth_provider=OAuthProvider.BASIC),
-    ):
-        yield

@@ -3,6 +3,9 @@ import enum
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel
+from sqlmodel import Field, Relationship
+
+from datajunction_server.models.user import User
 
 
 class Engine(BaseModel):
@@ -121,6 +124,7 @@ class Tag(BaseModel):
     name: str
     display_name: str
     tag_type: str
+    created_by: int = Field(foreign_key="users.id")
 
 
 class AvailabilityState(BaseModel):

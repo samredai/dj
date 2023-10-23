@@ -533,6 +533,7 @@ class NodeNamespace(SQLModel, table=True):  # type: ignore
         sa_column=SqlaColumn(DateTime(timezone=True)),
         default=None,
     )
+    created_by: int = Field(foreign_key="users.id")
 
 
 class Node(NodeBase, table=True):  # type: ignore
@@ -584,6 +585,8 @@ class Node(NodeBase, table=True):  # type: ignore
             "secondaryjoin": "TagNodeRelationship.tag_id==Tag.id",
         },
     )
+
+    created_by: int = Field(foreign_key="users.id")
 
     def __hash__(self) -> int:
         return hash(self.id)

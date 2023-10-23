@@ -16,19 +16,32 @@ from datajunction_server.models.node import (
     NodeType,
     PartitionAvailability,
 )
+from datajunction_server.models.user import User
 
 
-def test_node_relationship(session: Session) -> None:
+def test_node_relationship(session: Session, mock_user_dj: User) -> None:
     """
     Test the n:n self-referential relationships.
     """
-    node_a = Node(name="A", current_version="1")
+    node_a = Node(
+        name="A",
+        current_version="1",
+        created_by=mock_user_dj.id,
+    )
     node_a_rev = NodeRevision(name="A", version="1", node=node_a)
 
-    node_b = Node(name="B", current_version="1")
+    node_b = Node(
+        name="B",
+        current_version="1",
+        created_by=mock_user_dj.id,
+    )
     node_a_rev = NodeRevision(name="B", version="1", node=node_b)
 
-    node_c = Node(name="C", current_version="1")
+    node_c = Node(
+        name="C",
+        current_version="1",
+        created_by=mock_user_dj.id,
+    )
     node_c_rev = NodeRevision(
         name="C",
         version="1",
@@ -47,11 +60,16 @@ def test_node_relationship(session: Session) -> None:
     assert node_c_rev.parents == [node_a, node_b]
 
 
-def test_extra_validation() -> None:
+def test_extra_validation(mock_user_dj: User) -> None:
     """
     Test ``extra_validation``.
     """
-    node = Node(name="A", type=NodeType.SOURCE, current_version="1")
+    node = Node(
+        name="A",
+        type=NodeType.SOURCE,
+        current_version="1",
+        created_by=mock_user_dj.id,
+    )
     node_revision = NodeRevision(
         name=node.name,
         type=node.type,
