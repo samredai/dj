@@ -3,9 +3,7 @@ import enum
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel
-from sqlmodel import Field, Relationship
-
-from datajunction_server.models.user import User
+from sqlmodel import Field
 
 
 class Engine(BaseModel):
