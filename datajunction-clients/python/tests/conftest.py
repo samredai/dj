@@ -42,6 +42,7 @@ def settings(mocker: MockerFixture) -> Iterator[Settings]:
         celery_broker=None,
         redis_cache=None,
         query_service=None,
+        secret="a-fake-secretkey",
     )
 
     mocker.patch(
