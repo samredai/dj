@@ -162,7 +162,13 @@ class DJClient:
                 show_traceback=self._debug,
             )
             if username:
-                self._session.post("/basic/login/", data={"username": username, "password": password or os.getenv("DJ_PWD")})
+                self._session.post(
+                    "/basic/login/",
+                    data={
+                        "username": username,
+                        "password": password or os.getenv("DJ_PWD"),
+                    },
+                )
         else:  # pragma: no cover
             self._session = requests_session
         self._timeout = timeout

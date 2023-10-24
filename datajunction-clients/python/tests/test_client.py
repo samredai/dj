@@ -16,7 +16,11 @@ class TestDJClient:  # pylint: disable=too-many-public-methods
         """
         Returns a DJ client instance
         """
-        return DJClient(requests_session=session_with_examples, username="datajunction", password="datajunction")  # type: ignore
+        return DJClient(
+            requests_session=session_with_examples,  # type: ignore
+            username="datajunction",
+            password="datajunction",
+        )
 
     #
     # List basic objects: namespaces, dimensions, metrics, cubes
