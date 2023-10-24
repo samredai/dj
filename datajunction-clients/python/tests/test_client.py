@@ -180,7 +180,10 @@ class TestDJClient:  # pylint: disable=too-many-public-methods
         """
         # full list
         nodes = client.list_transforms()
-        assert nodes == ["default.repair_orders_thin", "foo.bar.repair_orders_thin"]
+        assert set(nodes) == {
+            "default.repair_orders_thin",
+            "foo.bar.repair_orders_thin",
+        }
 
         # partial list
         nodes = client.list_transforms(namespace="foo.bar")
