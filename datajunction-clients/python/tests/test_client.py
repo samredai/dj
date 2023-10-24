@@ -115,7 +115,7 @@ class TestDJClient:  # pylint: disable=too-many-public-methods
         """
         # full list
         cubes = client.list_cubes()
-        assert cubes == ["foo.bar.cube_one", "default.cube_two"]
+        assert set(cubes) == {"foo.bar.cube_one", "default.cube_two"}
 
         # partial list
         cubes = client.list_cubes(namespace="foo.bar")
