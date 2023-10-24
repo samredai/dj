@@ -175,6 +175,8 @@ def server(  # pylint: disable=too-many-statements
     ] = get_query_service_client_override
 
     with TestClient(app) as test_client:
+        test_client.post("/basic/user/", data={"email": "dj@datajuncion.io", "username": "datajunction", "password": "datajunction"})
+        test_client.post("/basic/login/", data={"username": "datajunction", "password": "datajunction"})
         yield test_client
 
     app.dependency_overrides.clear()
