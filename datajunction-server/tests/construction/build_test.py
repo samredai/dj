@@ -1,8 +1,9 @@
 """tests for building nodes"""
 
-from typing import Dict, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
 import pytest
+from fastapi.testclient import TestClient  # pylint: disable=unused-import
 from sqlalchemy import select
 from sqlmodel import Session
 
@@ -24,11 +25,12 @@ from .fixtures import BUILD_EXPECTATION_PARAMETERS
 
 @pytest.mark.parametrize("node_name,db_id", BUILD_EXPECTATION_PARAMETERS)
 @pytest.mark.asyncio
-async def test_build_node(node_name: str, db_id: int, request):
+async def test_build_node(node_name: str, db_id: int, get_mock_user: Callable, request):
     """
     Test building a node
     """
     construction_session: Session = request.getfixturevalue("construction_session")
+    get_mock_user(session=construction_session)
     build_expectation: Dict[
         str,
         Dict[Optional[int], Tuple[bool, str]],
@@ -56,11 +58,10 @@ async def test_build_node(node_name: str, db_id: int, request):
 
 
 @pytest.mark.asyncio
-async def test_build_metric_with_dimensions_aggs(request):
+async def test_build_metric_with_dimensions_aggs(construction_session: Session):
     """
     Test building metric with dimensions
     """
-    construction_session: Session = request.getfixturevalue("construction_session")
     num_comments_mtc: Node = next(
         construction_session.exec(
             select(Node).filter(Node.name == "basic.num_comments"),
@@ -129,12 +130,13 @@ def test_build_metric_with_required_dimensions(request):
 @pytest.mark.asyncio
 async def test_raise_on_build_without_required_dimension_column(
     request,
-    mock_user_dj: User,
+    get_mock_user: Callable,
 ):
     """
     Test building a node that has a dimension reference without a column and a compound PK
     """
     construction_session: Session = request.getfixturevalue("construction_session")
+    mock_user: User = get_mock_user(session=construction_session)
     primary_key: AttributeType = next(
         construction_session.exec(
             select(AttributeType).filter(AttributeType.name == "primary_key"),
@@ -144,7 +146,7 @@ async def test_raise_on_build_without_required_dimension_column(
         name="basic.dimension.compound_countries",
         type=NodeType.DIMENSION,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     NodeRevision(
         name=countries_dim_ref.name,
@@ -176,7 +178,7 @@ async def test_raise_on_build_without_required_dimension_column(
         name="basic.foo",
         type=NodeType.TRANSFORM,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     node_foo = NodeRevision(
         name=node_foo_ref.name,
@@ -203,7 +205,7 @@ async def test_raise_on_build_without_required_dimension_column(
         name="basic.bar",
         type=NodeType.TRANSFORM,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     node_bar = NodeRevision(
         name=node_bar_ref.name,

@@ -12,7 +12,7 @@ import pytest
 from cachelib.simple import SimpleCache
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine, select
 from sqlmodel.pool import StaticPool
 
 from datajunction_server.api.main import app
@@ -42,23 +42,15 @@ EXAMPLE_TOKEN = (
 
 
 @pytest.fixture(scope="session", autouse=True)
-def mock_user_dj() -> User:
+def get_mock_user() -> Callable:
     """
-    Mock a DJ user for tests
+    Returns a callable that gets the dj user from a session
     """
-    return User(id=1, username="dj", oauth_provider=OAuthProvider.BASIC)
 
+    def _get_mock_user(session: Session):
+        return session.exec(select(User).where(User.username == "dj")).one()
 
-@pytest.fixture(scope="session", autouse=True)
-def default_session_fixture(mock_user_dj: User) -> Iterator[None]:
-    """
-    Global patches to include with the default session
-    """
-    with patch(
-        "datajunction_server.internal.access.authentication.http.get_user",
-        return_value=mock_user_dj,
-    ):
-        yield
+    return _get_mock_user
 
 
 @pytest.fixture
@@ -218,11 +210,11 @@ def client(  # pylint: disable=too-many-statements
     app.dependency_overrides[get_settings] = get_settings_override
 
     with TestClient(app) as client:
-        client.headers.update(
-            {
-                "Authorization": f"Bearer {EXAMPLE_TOKEN}",
-            },
+        client.post(
+            "/basic/user/",
+            data={"email": "dj@datajunction.io", "username": "dj", "password": "dj"},
         )
+        client.post("/basic/login/", data={"username": "dj", "password": "dj"})
         yield client
 
     app.dependency_overrides.clear()
@@ -434,14 +426,11 @@ def client_with_query_service_example_loader(  # pylint: disable=too-many-statem
     ] = get_query_service_client_override
 
     with TestClient(app) as client:
-        # The test client includes a signed and encrypted JWT in the authorization headers.
-        # Even though the user is mocked to always return a "dj" user, this allows for the
-        # JWT logic to be tested on all requests.
-        client.headers.update(
-            {
-                "Authorization": f"Bearer {EXAMPLE_TOKEN}",
-            },
+        client.post(
+            "/basic/user/",
+            data={"email": "dj@datajunction.io", "username": "dj", "password": "dj"},
         )
+        client.post("/basic/login/", data={"username": "dj", "password": "dj"})
 
         def _load_examples(examples_to_load: Optional[List[str]] = None):
             return load_examples_in_client(client, examples_to_load)

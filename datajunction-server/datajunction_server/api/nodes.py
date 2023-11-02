@@ -380,7 +380,7 @@ def create_source(
         namespace=data.namespace,
         type=NodeType.SOURCE,
         current_version=0,
-        created_by=current_user.id,
+        created_by=current_user,
     )
     catalog = get_catalog_by_name(session=session, name=data.catalog)
 
@@ -482,7 +482,7 @@ def create_node(
         namespace=data.namespace,
         type=NodeType(node_type),
         current_version=0,
-        created_by=current_user.id,
+        created_by=current_user,
     )
     node_revision = create_node_revision(data, node_type, session)
     save_node(session, node_revision, node, data.mode, current_user=current_user)
@@ -559,7 +559,7 @@ def create_cube(
         namespace=data.namespace,
         type=NodeType.CUBE,
         current_version=0,
-        created_by=current_user.id,
+        created_by=current_user,
     )
     node_revision = create_cube_node_revision(session=session, data=data)
     save_node(session, node_revision, node, data.mode, current_user=current_user)

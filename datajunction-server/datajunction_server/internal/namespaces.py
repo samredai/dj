@@ -177,7 +177,7 @@ def create_namespace(
         ):
             node_namespace = NodeNamespace(
                 namespace=parent_namespace,
-                created_by=current_user.id,
+                created_by=current_user,
             )
             session.add(node_namespace)
             session.add(

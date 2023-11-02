@@ -18,18 +18,19 @@ from tests.sql.utils import compare_query_strings
 def test_sql(
     session: Session,
     client: TestClient,
-    mock_user_dj: User,
+    get_mock_user: Callable,
 ) -> None:
     """
     Test ``GET /sql/{name}/``.
     """
+    mock_user: User = get_mock_user(session)
     database = Database(name="test", URI="blah://", tables=[])
 
     source_node = Node(
         name="my_table",
         type=NodeType.SOURCE,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     source_node_rev = NodeRevision(
         name=source_node.name,
@@ -45,7 +46,7 @@ def test_sql(
         name="a-metric",
         type=NodeType.METRIC,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     node_revision = NodeRevision(
         name=node.name,

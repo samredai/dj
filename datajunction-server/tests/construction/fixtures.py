@@ -5,7 +5,7 @@
 from typing import Dict, List, Optional, Tuple
 
 import pytest
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from datajunction_server.models import (
     AttributeType,
@@ -16,7 +16,7 @@ from datajunction_server.models import (
     Table,
 )
 from datajunction_server.models.node import Node, NodeType
-from datajunction_server.models.user import User
+from datajunction_server.models.user import OAuthProvider, User
 from datajunction_server.sql.parsing.types import (
     DateType,
     FloatType,
@@ -25,6 +25,7 @@ from datajunction_server.sql.parsing.types import (
     StringType,
     TimestampType,
 )
+from datajunction_server.utils import get_session  # pylint: disable=unused-import
 
 BUILD_NODE_NAMES: List[str] = [
     "basic.source.users",
@@ -183,12 +184,19 @@ def build_expectation() -> Dict[str, Dict[Optional[int], Tuple[bool, str]]]:
 @pytest.fixture
 def construction_session(  # pylint: disable=too-many-locals
     session: Session,
-    mock_user_dj: User,
 ) -> Session:
     """
     Add some source nodes and transform nodes to facilitate testing of extracting dependencies
     """
-
+    mock_user: User = User(
+        id=1,
+        username="dj",
+        password="dj",
+        email="dj@datajunction.io",
+        oauth_provider=OAuthProvider.BASIC,
+    )
+    if not session.exec(select(User).where(User.username == "dj")).one_or_none():
+        session.add(mock_user)
     postgres = Database(name="postgres", URI="", cost=10, id=1)
 
     gsheets = Database(name="gsheets", URI="", cost=100, id=2)
@@ -197,7 +205,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.dimension.countries",
         type=NodeType.DIMENSION,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     countries_dim = NodeRevision(
         name=countries_dim_ref.name,
@@ -224,7 +232,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.dimension.users",
         type=NodeType.DIMENSION,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     user_dim = NodeRevision(
         name=user_dim_ref.name,
@@ -260,7 +268,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.transform.country_agg",
         type=NodeType.TRANSFORM,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     country_agg_tfm = NodeRevision(
         name=country_agg_tfm_ref.name,
@@ -288,7 +296,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.source.users",
         type=NodeType.SOURCE,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     users_src = NodeRevision(
         name=users_src_ref.name,
@@ -396,7 +404,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.source.comments",
         type=NodeType.SOURCE,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     comments_src = NodeRevision(
         name=comments_src_ref.name,
@@ -448,7 +456,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.num_comments",
         type=NodeType.METRIC,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     num_comments_mtc = NodeRevision(
         name=num_comments_mtc_ref.name,
@@ -468,7 +476,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.num_comments_bnd",
         type=NodeType.METRIC,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     num_comments_mtc_bnd_dims = NodeRevision(
         name=num_comments_mtc_bnd_dims_ref.name,
@@ -492,7 +500,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.num_users",
         type=NodeType.METRIC,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     num_users_mtc = NodeRevision(
         name=num_users_mtc_ref.name,
@@ -511,7 +519,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="basic.num_users_us",
         type=NodeType.METRIC,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     num_users_us_join_mtc = NodeRevision(
         name=num_users_us_join_mtc_ref.name,
@@ -536,7 +544,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="dbt.dimension.customers",
         type=NodeType.DIMENSION,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     customers_dim = NodeRevision(
         name=customers_dim_ref.name,
@@ -564,7 +572,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="dbt.transform.customer_agg",
         type=NodeType.TRANSFORM,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     customers_agg_tfm = NodeRevision(
         name=customers_agg_tfm_ref.name,
@@ -594,7 +602,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="dbt.source.jaffle_shop.orders",
         type=NodeType.SOURCE,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     orders_src = NodeRevision(
         name=orders_src_ref.name,
@@ -636,7 +644,7 @@ def construction_session(  # pylint: disable=too-many-locals
         name="dbt.source.jaffle_shop.customers",
         type=NodeType.SOURCE,
         current_version="1",
-        created_by=mock_user_dj.id,
+        created_by=mock_user,
     )
     customers_src = NodeRevision(
         name=customers_src_ref.name,
