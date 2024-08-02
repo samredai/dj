@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import NodeStatus from '../NodePage/NodeStatus';
 import DJClientContext from '../../providers/djclient';
@@ -18,6 +18,8 @@ export function NamespacePage() {
 
   const djClient = useContext(DJClientContext).DataJunctionAPI;
   var { namespace } = useParams();
+  const [searchParams] = useSearchParams();
+  const collection = searchParams.get('collection');
 
   const [state, setState] = useState({
     namespace: namespace,
@@ -88,7 +90,7 @@ export function NamespacePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const namespaces = await djClient.namespaces();
+      const namespaces = await djClient.namespaces({collection});
       const hierarchy = createNamespaceHierarchy(namespaces);
       setNamespaceHierarchy(hierarchy);
     };

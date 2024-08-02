@@ -1,17 +1,18 @@
 """Collection database schema."""
 from datetime import datetime, timezone
 from functools import partial
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from datajunction_server.database.base import Base
-from datajunction_server.database.node import Node
 from datajunction_server.errors import DJDoesNotExistException
 from datajunction_server.typing import UTCDatetime
 
+if TYPE_CHECKING:
+    from datajunction_server.database.node import Node
 
 class Collection(Base):  # pylint: disable=too-few-public-methods
     """
@@ -23,11 +24,13 @@ class Collection(Base):  # pylint: disable=too-few-public-methods
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[Optional[str]] = mapped_column(String, default=None, unique=True)
     description: Mapped[Optional[str]] = mapped_column(String, default=None)
-    nodes: Mapped[List[Node]] = relationship(
+    nodes: Mapped[List["Node"]] = relationship(
+        "Node",
         secondary="collectionnodes",
         primaryjoin="Collection.id==CollectionNodes.collection_id",
         secondaryjoin="Node.id==CollectionNodes.node_id",
         lazy="selectin",
+        back_populates="collections",
     )
     created_at: Mapped[UTCDatetime] = mapped_column(
         DateTime(timezone=True),

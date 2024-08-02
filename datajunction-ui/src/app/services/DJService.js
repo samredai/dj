@@ -1,5 +1,13 @@
 import { MarkerType } from 'reactflow';
 
+function buildQueryParams(params) {
+  const queryString = Object.keys(params)
+    .filter(key => params[key] !== undefined && params[key] !== null)
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+    .join('&');
+  return queryString ? `?${queryString}` : '';
+}
+
 const DJ_URL = process.env.REACT_APP_DJ_URL
   ? process.env.REACT_APP_DJ_URL
   : 'http://localhost:8000';
@@ -51,10 +59,18 @@ export const DataJunctionAPI = {
     return data;
   },
 
-  nodes: async function (prefix) {
-    const queryParams = prefix ? `?prefix=${prefix}` : '';
+  nodes: async function (queryParams = {}) {
+    const queryString = buildQueryParams(queryParams);
     return await (
-      await fetch(`${DJ_URL}/nodes/${queryParams}`, {
+      await fetch(`${DJ_URL}/nodes/${queryString}`, {
+        credentials: 'include',
+      })
+    ).json();
+  },
+
+  collections: async function () {
+    return await (
+      await fetch(`${DJ_URL}/collections`, {
         credentials: 'include',
       })
     ).json();
@@ -354,9 +370,10 @@ export const DataJunctionAPI = {
     ).json();
   },
 
-  namespaces: async function () {
+  namespaces: async function (queryParams = {}) {
+    const queryString = buildQueryParams(queryParams);
     return await (
-      await fetch(`${DJ_URL}/namespaces/`, {
+      await fetch(`${DJ_URL}/namespaces/${queryString}`, {
         credentials: 'include',
       })
     ).json();

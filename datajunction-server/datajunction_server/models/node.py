@@ -19,6 +19,7 @@ from datajunction_server.enum import StrEnum
 from datajunction_server.errors import DJError
 from datajunction_server.models.base import labelize
 from datajunction_server.models.catalog import CatalogInfo
+from datajunction_server.models.collection import CollectionInfo
 from datajunction_server.models.column import ColumnYAML
 from datajunction_server.models.database import DatabaseOutput
 from datajunction_server.models.dimensionlink import LinkDimensionOutput
@@ -830,6 +831,7 @@ class NodeOutput(GenericNodeOutputModel):
     tags: List[TagOutput] = []
     current_version: str
     missing_table: Optional[bool] = False
+    collections: List[CollectionInfo] = []
 
     class Config:  # pylint: disable=missing-class-docstring,too-few-public-methods
         orm_mode = True
@@ -847,6 +849,7 @@ class NodeOutput(GenericNodeOutputModel):
         return [
             selectinload(Node.current).options(*NodeRevision.default_load_options()),
             joinedload(Node.tags),
+            selectinload(Node.collections),
         ]
 
 

@@ -25,6 +25,7 @@ from datajunction_server.database.attributetype import ColumnAttribute
 from datajunction_server.database.availabilitystate import AvailabilityState
 from datajunction_server.database.base import Base
 from datajunction_server.database.catalog import Catalog
+from datajunction_server.database.collection import Collection
 from datajunction_server.database.column import Column
 from datajunction_server.database.materialization import Materialization
 from datajunction_server.database.metricmetadata import MetricMetadata
@@ -45,6 +46,7 @@ from datajunction_server.utils import SEPARATOR
 
 if TYPE_CHECKING:
     from datajunction_server.database.dimensionlink import DimensionLink
+    from datajunction_server.database.collection import Collection
 
 
 class NodeRelationship(Base):  # pylint: disable=too-few-public-methods
@@ -222,6 +224,13 @@ class Node(Base):  # pylint: disable=too-few-public-methods
 
     missing_table: Mapped[bool] = mapped_column(sa.Boolean, default=False)
 
+    collections: Mapped[List["Collection"]] = relationship(
+        secondary="collectionnodes",
+        primaryjoin="Node.id==CollectionNodes.node_id",
+        secondaryjoin="Collection.id==CollectionNodes.collection_id",
+        lazy="selectin",
+    )
+
     def __hash__(self) -> int:
         return hash(self.id)
 
@@ -244,6 +253,7 @@ class Node(Base):  # pylint: disable=too-few-public-methods
                 *NodeRevision.default_load_options(),
             ),
             selectinload(Node.tags),
+            selectinload(Node.collections),
         ]
         statement = statement.options(*options)
         if not include_inactive:
@@ -342,6 +352,7 @@ class Node(Base):  # pylint: disable=too-few-public-methods
         session: AsyncSession,
         prefix: Optional[str],
         node_type: NodeType,
+        collection: Optional[str],
         *options: ExecutableOption,
     ) -> List["Node"]:
         """
@@ -354,6 +365,8 @@ class Node(Base):  # pylint: disable=too-few-public-methods
             )
         if node_type:
             statement = statement.where(Node.type == node_type)
+        if collection:
+            statement = statement.filter(Node.collections.any(Collection.name == collection))
         result = await session.execute(statement.options(*options))
         return result.unique().scalars().all()
 

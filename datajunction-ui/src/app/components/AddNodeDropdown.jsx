@@ -3,7 +3,7 @@ export default function AddNodeDropDown({ namespace }) {
     <span className="menu-link">
       <span className="menu-title">
         <div className="dropdown">
-          <span className="add_node">+ Add Node</span>
+          <span className="add_node">+ Create</span>
           <div className="dropdown-content">
             <a href={`/create/source`}>
               <div className="node_type__source node_type_creation_heading">
@@ -33,6 +33,11 @@ export default function AddNodeDropDown({ namespace }) {
             <a href={`/create/cube/${namespace}`}>
               <div className="node_type__cube node_type_creation_heading">
                 Cube
+              </div>
+            </a>
+            <a href={`/create/collection`}>
+              <div className="node_type_creation_heading">
+                Collection
               </div>
             </a>
           </div>

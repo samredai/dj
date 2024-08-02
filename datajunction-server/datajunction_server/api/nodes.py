@@ -28,6 +28,7 @@ from datajunction_server.api.tags import get_tags_by_name
 from datajunction_server.constants import NODE_LIST_MAX
 from datajunction_server.database import DimensionLink
 from datajunction_server.database.attributetype import ColumnAttribute
+from datajunction_server.database.collection import Collection
 from datajunction_server.database.column import Column
 from datajunction_server.database.history import ActivityType, EntityType, History
 from datajunction_server.database.node import Node, NodeRevision
@@ -226,6 +227,7 @@ async def set_column_attributes(
 async def list_nodes(
     node_type: Optional[NodeType] = None,
     prefix: Optional[str] = None,
+    collection: Optional[str] = None,
     *,
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_and_update_current_user),
@@ -236,7 +238,7 @@ async def list_nodes(
     """
     List the available nodes.
     """
-    nodes = await Node.find(session, prefix, node_type)  # type: ignore
+    nodes = await Node.find(session, prefix, node_type, collection)  # type: ignore
     return [
         approval.access_object.name
         for approval in validate_access_requests(
@@ -257,6 +259,7 @@ async def list_nodes(
 @cache(expire=settings.index_cache_expire)
 async def list_all_nodes_with_details(
     node_type: Optional[NodeType] = None,
+    collection: Optional[str] = None,
     *,
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_and_update_current_user),
@@ -282,6 +285,8 @@ async def list_all_nodes_with_details(
         )
         .limit(NODE_LIST_MAX)
     )  # Very high limit as a safeguard
+    if collection:
+        nodes_query = nodes_query.filter(Node.collections.any(Collection.name == collection))
     results = [
         NodeIndexItem(name=row[0], display_name=row[1], description=row[2], type=row[3])
         for row in (await session.execute(nodes_query)).all()

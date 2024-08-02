@@ -102,6 +102,7 @@ async def create_node_namespace(
 )
 async def list_namespaces(
     session: AsyncSession = Depends(get_session),
+    collection: Optional[str] = None,
     current_user: User = Depends(get_and_update_current_user),
     validate_access: access.ValidateAccessFn = Depends(  # pylint: disable=W0621
         validate_access,
@@ -110,7 +111,7 @@ async def list_namespaces(
     """
     List namespaces with the number of nodes contained in them
     """
-    results = await NodeNamespace.get_all_with_node_count(session)
+    results = await NodeNamespace.get_all_with_node_count(session, collection=collection)
     resource_requests = [
         access.ResourceRequest(
             verb=access.ResourceRequestVerb.BROWSE,

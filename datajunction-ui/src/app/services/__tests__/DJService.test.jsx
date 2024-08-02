@@ -126,7 +126,7 @@ describe('DataJunctionAPI', () => {
   it('calls nodes correctly', async () => {
     const prefix = 'samplePrefix';
     fetch.mockResponseOnce(JSON.stringify({}));
-    await DataJunctionAPI.nodes(prefix);
+    await DataJunctionAPI.nodes({prefix});
     expect(fetch).toHaveBeenCalledWith(`${DJ_URL}/nodes/?prefix=${prefix}`, {
       credentials: 'include',
     });

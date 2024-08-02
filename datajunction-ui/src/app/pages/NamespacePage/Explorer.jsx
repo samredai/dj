@@ -1,11 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import CollapsedIcon from '../../icons/CollapsedIcon';
 import ExpandedIcon from '../../icons/ExpandedIcon';
 
-const Explorer = ({ item = [], current }) => {
+const renderNamespaceUrl = (namespace, collection) => {
+  let url = `/namespaces/${namespace}`;
+  console.log(collection)
+  if (collection) {
+    url += `?collection=${encodeURIComponent(collection)}`;
+  }
+  return url;
+};
+
+const Explorer = ({ item = [], current, collection }) => {
   const [items, setItems] = useState([]);
   const [expand, setExpand] = useState(false);
   const [highlight, setHighlight] = useState(false);
+  const [searchParams] = useSearchParams();
+  const collection = searchParams.get('collection');
 
   useEffect(() => {
     setItems(item);
@@ -33,7 +45,7 @@ const Explorer = ({ item = [], current }) => {
         {items.children && items.children.length > 0 ? (
           <span>{!expand ? <CollapsedIcon /> : <ExpandedIcon />} </span>
         ) : null}
-        <a href={`/namespaces/${items.path}`}>{items.namespace}</a>{' '}
+        <a href={renderNamespaceUrl(items.path, collection)}>{items.namespace}</a>{' '}
       </div>
       {items.children
         ? items.children.map((item, index) => (

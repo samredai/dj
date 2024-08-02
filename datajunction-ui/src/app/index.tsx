@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet-async';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { NamespacePage } from './pages/NamespacePage/Loadable';
+import { CollectionsPage } from './pages/CollectionsPage/Loadable';
 import { NodePage } from './pages/NodePage/Loadable';
 import RevisionDiff from './pages/NodePage/RevisionDiff';
 import { SQLBuilderPage } from './pages/SQLBuilderPage/Loadable';
@@ -67,6 +68,7 @@ export function App() {
                       </Route>
 
                       <Route path="/" element={<NamespacePage />} key="index" />
+                      <Route path="collections" element={<CollectionsPage />} key="index" />
                       <Route path="namespaces">
                         <Route
                           path=":namespace"

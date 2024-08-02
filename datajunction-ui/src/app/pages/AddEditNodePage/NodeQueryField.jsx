@@ -17,7 +17,7 @@ export const NodeQueryField = ({ djClient, value }) => {
     // into the autocomplete schema. At this stage we don't load the columns
     // to save on unnecessary calls
     const word = context.matchBefore(/[\.\w]*/);
-    const matches = await djClient.nodes(word.text);
+    const matches = await djClient.nodes({prefix: word.text});
     matches.forEach(nodeName => {
       if (schema[nodeName] === undefined) {
         schema[nodeName] = [];

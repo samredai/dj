@@ -34,7 +34,7 @@ class NodeNamespace(Base):  # pylint: disable=too-few-public-methods
     )
 
     @classmethod
-    async def get_all_with_node_count(cls, session: AsyncSession):
+    async def get_all_with_node_count(cls, session: AsyncSession, collection: Optional[str] = None):
         """
         Get all namespaces with the number of nodes in that namespaces.
         """
@@ -51,8 +51,11 @@ class NodeNamespace(Base):  # pylint: disable=too-few-public-methods
             .where(
                 is_(NodeNamespace.deactivated_at, None),
             )
-            .group_by(NodeNamespace.namespace)
         )
+        if collection is not None:
+            statement = statement.where(Node.collections.any(name=collection))
+        
+        statement = statement.group_by(NodeNamespace.namespace)
         result = await session.execute(statement)
         return result.all()
 
