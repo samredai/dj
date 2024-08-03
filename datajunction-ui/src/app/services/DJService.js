@@ -76,6 +76,25 @@ export const DataJunctionAPI = {
     ).json();
   },
 
+  collection: async function (name) {
+    return await (
+      await fetch(`${DJ_URL}/collections/${name}`, {
+        credentials: 'include',
+      })
+    ).json();
+  },
+
+  addNodeToCollection: async function (nodeName, collectionName) {
+    return await await fetch(`${DJ_URL}/collections/${collectionName}/nodes`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([nodeName]),
+    }).catch(e => console.log(`Error adding node to collection: ${e}`));
+  },
+
   nodesWithType: async function (nodeType) {
     return await (
       await fetch(`${DJ_URL}/nodes/?node_type=${nodeType}`, {
@@ -470,16 +489,22 @@ export const DataJunctionAPI = {
   },
 
   notebookExportCube: async function (cube) {
-    return await fetch(`${DJ_URL}/datajunction-clients/python/notebook/?cube=${cube}`, {
-      credentials: 'include',
-    });
+    return await fetch(
+      `${DJ_URL}/datajunction-clients/python/notebook/?cube=${cube}`,
+      {
+        credentials: 'include',
+      },
+    );
   },
 
   notebookExportNamespace: async function (namespace) {
     return await (
-      await fetch(`${DJ_URL}/datajunction-clients/python/notebook/?namespace=${namespace}`, {
-        credentials: 'include',
-      })
+      await fetch(
+        `${DJ_URL}/datajunction-clients/python/notebook/?namespace=${namespace}`,
+        {
+          credentials: 'include',
+        },
+      )
     ).json();
   },
 

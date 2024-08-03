@@ -6,11 +6,14 @@ import DJClientContext from '../../providers/djclient';
 import Explorer from '../NamespacePage/Explorer';
 import AddNodeDropdown from '../../components/AddNodeDropdown';
 import NodeListActions from '../../components/NodeListActions';
+import CollectionBanner from '../../components/CollectionBanner';
 import AddNamespacePopover from './AddNamespacePopover';
 import 'styles/node-list.css';
 import 'styles/sorted-table.css';
 
 export function NamespacePage() {
+  const [collectionData, setCollectionData] = useState(null)
+
   const ASC = 'ascending';
   const DESC = 'descending';
 
@@ -20,7 +23,6 @@ export function NamespacePage() {
   var { namespace } = useParams();
   const [searchParams] = useSearchParams();
   const collection = searchParams.get('collection');
-
   const [state, setState] = useState({
     namespace: namespace,
     nodes: [],
@@ -28,7 +30,10 @@ export function NamespacePage() {
 
   const [namespaceHierarchy, setNamespaceHierarchy] = useState([]);
 
-  const [sortConfig, setSortConfig] = useState({ key: 'updated_at', direction: DESC });
+  const [sortConfig, setSortConfig] = useState({
+    key: 'updated_at',
+    direction: DESC,
+  });
   const sortedNodes = React.useMemo(() => {
     let sortableData = [...Object.values(state.nodes)];
     if (sortConfig !== null) {
@@ -45,7 +50,7 @@ export function NamespacePage() {
     return sortableData;
   }, [state.nodes, sortConfig]);
 
-  const requestSort = (key) => {
+  const requestSort = key => {
     let direction = ASC;
     if (sortConfig.key === key && sortConfig.direction === ASC) {
       direction = DESC;
@@ -53,7 +58,7 @@ export function NamespacePage() {
     setSortConfig({ key, direction });
   };
 
-  const getClassNamesFor = (name) => {
+  const getClassNamesFor = name => {
     if (sortConfig.key === name) {
       return sortConfig.direction;
     }
@@ -90,7 +95,7 @@ export function NamespacePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const namespaces = await djClient.namespaces({collection});
+      const namespaces = await djClient.namespaces({ collection });
       const hierarchy = createNamespaceHierarchy(namespaces);
       setNamespaceHierarchy(hierarchy);
     };
@@ -98,12 +103,28 @@ export function NamespacePage() {
   }, [djClient, djClient.namespaces]);
 
   useEffect(() => {
+    if (collection) {
+      const fetchData = async () => {
+        const collectionData = await djClient.collection(collection);
+        setCollectionData(collectionData);
+      };
+      fetchData().catch(console.error);
+    }
+
+  }, [collection]);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (namespace === undefined && namespaceHierarchy !== undefined) {
         namespace = namespaceHierarchy[0].namespace;
       }
       const nodes = await djClient.namespace(namespace);
-      const foundNodes = await Promise.all(nodes);
+      let foundNodes = await Promise.all(nodes);
+      if (collectionData) {
+        foundNodes = foundNodes.filter(node => 
+          collectionData.nodes.some(collectionNode => node.name === collectionNode.name)
+        );
+      }
       setState({
         namespace: namespace,
         nodes: foundNodes,
@@ -148,9 +169,18 @@ export function NamespacePage() {
       </td>
     </tr>
   ));
-
   return (
     <div className="mid">
+      {collectionData ? (
+        <CollectionBanner
+          name={collectionData.name}
+          description={collectionData.description}
+          numNodes={collectionData.nodes.length}
+        />
+      ) : (
+        <></>
+      )}
+
       <div className="card">
         <div className="card-header">
           <h2>Explore</h2>
@@ -166,7 +196,7 @@ export function NamespacePage() {
                   padding: '1rem 1rem 1rem 0',
                 }}
               >
-                Namespaces <AddNamespacePopover namespace={namespace}/>
+                Namespaces <AddNamespacePopover namespace={namespace} />
               </span>
               {namespaceHierarchy
                 ? namespaceHierarchy.map(child => (
@@ -184,7 +214,11 @@ export function NamespacePage() {
                   {fields.map(field => {
                     return (
                       <th>
-                        <button type="button" onClick={() => requestSort(field)} className={'sortable ' + getClassNamesFor(field)}>
+                        <button
+                          type="button"
+                          onClick={() => requestSort(field)}
+                          className={'sortable ' + getClassNamesFor(field)}
+                        >
                           {field.replace('_', ' ')}
                         </button>
                       </th>

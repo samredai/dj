@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import Tab from '../../components/Tab';
 import NamespaceHeader from '../../components/NamespaceHeader';
+import AddToCollectionButton from '../../components/AddToCollectionButton';
 import NodeInfoTab from './NodeInfoTab';
 import NodeColumnTab from './NodeColumnTab';
 import NodeGraphTab from './NodeGraphTab';
@@ -188,6 +189,7 @@ export function NodePage() {
               <EditIcon />
             </a>
             <ClientCodePopover code={node?.createNodeClientCode} />
+            <AddToCollectionButton nodeName={node?.name} />
             <div>
               <a
                 href={'/nodes/' + node?.name}

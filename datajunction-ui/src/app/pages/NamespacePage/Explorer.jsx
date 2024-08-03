@@ -5,7 +5,6 @@ import ExpandedIcon from '../../icons/ExpandedIcon';
 
 const renderNamespaceUrl = (namespace, collection) => {
   let url = `/namespaces/${namespace}`;
-  console.log(collection)
   if (collection) {
     url += `?collection=${encodeURIComponent(collection)}`;
   }

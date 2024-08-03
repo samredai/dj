@@ -19,7 +19,6 @@ export function CollectionsPage() {
     const fetchData = async () => {
       const collections = await djClient.collections();
       setCollections(collections);
-      console.log(collections);
     };
     fetchData().catch(console.error);
   }, [djClient, djClient.collections]);

@@ -3,11 +3,9 @@ export default function CollectionCard({ name, description }) {
     <article className="information [ card ]">
       <span className="collection_badge badge tag">Collection</span>
       <h2 className="title">{name}</h2>
-      <p className="info">
-        {description}
-      </p>
+      <p className="info">{description}</p>
       <a href={`/?collection=${name}`}>
-        View Nodes
+        <span className="menu-button">Explore</span>
       </a>
     </article>
   );
