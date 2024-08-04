@@ -1,19 +1,14 @@
 import { useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import CollectionCard from '../../components/CollectionCard';
+import CreateCollectionCard from '../../components/CreateCollectionCard';
 import DJClientContext from '../../providers/djclient';
 import 'styles/node-list.css';
 
 export function CollectionsPage() {
   const djClient = useContext(DJClientContext).DataJunctionAPI;
-  var { collection } = useParams();
-
-  const [state, setState] = useState({
-    collection: collection,
-    nodes: [],
-  });
-
   const [collections, setCollections] = useState([]);
+  const [showCreateCollection, setShowCreateCollection] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,14 +18,17 @@ export function CollectionsPage() {
     fetchData().catch(console.error);
   }, [djClient, djClient.collections]);
 
+  const displayCreateCollection = () => {
+    setShowCreateCollection(!showCreateCollection);
+  };
   return (
     <div className="mid">
       <div className="card-header">
         <span className="menu-link">
           <span className="menu-title">
-            <a href="/collections/create">
-              <span className="add_node">+ Create Collection</span>
-            </a>
+            <button className="menu-button" onClick={displayCreateCollection}>
+              + Create Collection
+            </button>
           </span>
         </span>
         <div className="">
@@ -38,7 +36,10 @@ export function CollectionsPage() {
             <p></p>
           </div>
           <div className="cards">
-            {collections.map(c => <CollectionCard name={c.name} description={c.description} />)}
+            {showCreateCollection ? <CreateCollectionCard /> : <></>}
+            {collections.map(c => (
+              <CollectionCard name={c.name} description={c.description} />
+            ))}
           </div>
         </div>
       </div>

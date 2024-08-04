@@ -31,6 +31,8 @@ module.exports = {
     historyApiFallback: {
       disableDotRule: true,
     },
+    hot: true,
+    contentBase: path.join(__dirname, 'dist'),
   },
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.scss'],
@@ -55,6 +57,7 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx|jsx)$/,
+        exclude: /node_modules/,
         use: [
           {
             loader: 'babel-loader',
@@ -114,5 +117,6 @@ module.exports = {
       filename: '[name].css', // isDevelopment ? '[name].css' : '[name].[hash].css',
       chunkFilename: '[id].css', // isDevelopment ? '[id].css' : '[id].[hash].css'
     }),
+    new webpack.HotModuleReplacementPlugin(),
   ],
 };

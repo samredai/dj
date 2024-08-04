@@ -1037,19 +1037,20 @@ pre {
 }
 
 .add_button {
-  background-color: #2f7986 !important;
+  background-color: #01B268 !important;
   color: #fff;
   text-transform: none;
   vertical-align: middle;
   padding-right: 1rem;
   padding-left: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.5rem !important;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  margin: 0.5rem !important;
   font-size: 1rem;
   border-radius: 0.5rem;
   word-wrap: break-word;
   white-space: break-spaces;
+  display: inline-block;
 }
 
 .edit_button {
@@ -1626,12 +1627,17 @@ table {
   background-color: #c5d1dd !important;
   text-transform: none;
   vertical-align: middle;
+  margin: 0.25rem;
   padding-right: 1rem;
   padding-left: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
   font-size: 1rem;
   border-radius: 0.5rem;
   word-wrap: break-word;
   white-space: break-spaces;
+  cursor: pointer;
+  width: auto;
+  display: inline-block;
+  text-align: center;
 }

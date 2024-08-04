@@ -26,7 +26,7 @@ export default function CollectionBanner({ name, description, numNodes, setNumNo
       await djClient.addNodeToCollection(selectedNode, name);
       setButtonText('Added!');
       setNumNodes(numNodes + 1);
-      setTimeout(() => setButtonText('Add'), 2000); // Reset button text after 2 seconds
+      setTimeout(() => setButtonText('Add'), 500); // Reset button text after 2 seconds
     } catch (error) {
       console.error('Failed to add node to collection:', error);
     }
@@ -44,9 +44,9 @@ export default function CollectionBanner({ name, description, numNodes, setNumNo
           <span className="header-badge">{numNodesDescription}</span>
         </div>
         <div>{description}</div>
-      </div>
-      <div className="card-body">
-        <select value={selectedNode} onChange={(e) => setSelectedNode(e.target.value)}>
+        <h3>Add Nodes to this Collection</h3>
+        <form>
+        <select className="SelectInput" value={selectedNode} onChange={(e) => setSelectedNode(e.target.value)}>
           <option value="" disabled>Select a node</option>
           {nodes.map((node) => (
             <option key={node} value={node}>
@@ -54,9 +54,11 @@ export default function CollectionBanner({ name, description, numNodes, setNumNo
             </option>
           ))}
         </select>
-        <button onClick={handleAddClick} disabled={!selectedNode}>
+        <button className="add_button" type="button" onClick={handleAddClick} disabled={!selectedNode}>
           {buttonText}
         </button>
+        </form>
+
       </div>
     </div>
   );

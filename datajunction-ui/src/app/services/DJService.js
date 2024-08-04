@@ -76,6 +76,24 @@ export const DataJunctionAPI = {
     ).json();
   },
 
+  createCollection: async function (name, description) {
+    return await await fetch(`${DJ_URL}/collections/`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({name, description}),
+    }).catch(e => console.log(`Error creating collection: ${e}`));
+  },
+
+  deleteCollection: async function (name) {
+    return await await fetch(`${DJ_URL}/collections/${name}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    }).catch(e => console.log(`Error deleting collection: ${e}`));
+  },
+
   collection: async function (name) {
     return await (
       await fetch(`${DJ_URL}/collections/${name}`, {

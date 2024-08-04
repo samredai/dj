@@ -4,6 +4,7 @@ import DJClientContext from '../providers/djclient';
 export default function AddToCollectionButton({ nodeName }) {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [collections, setCollections] = useState([]);
+  const [buttonText, setButtonText] = useState('+ Collection');
   const [selectedItem, setSelectedItem] = useState(null);
   const djClient = useContext(DJClientContext).DataJunctionAPI;
 
@@ -28,7 +29,11 @@ export default function AddToCollectionButton({ nodeName }) {
     if (selectedItem) {
       djClient
         .addNodeToCollection(nodeName, selectedItem)
-        .then(() => setDropdownVisible(false))
+        .then(() => {
+            setButtonText('Added!');
+            setDropdownVisible(false)
+            setTimeout(() => setButtonText('+ Collection'), 500); // Reset button text after 2 seconds
+        })
         .catch(error => {
           console.error('Error fetching collections:', error);
         });
@@ -37,10 +42,10 @@ export default function AddToCollectionButton({ nodeName }) {
   return (
     <div className="badge">
       {!isDropdownVisible && (
-        <button className="menu-button" onClick={handleButtonClick}>+ Collection</button>
+        <button className="menu-button" onClick={handleButtonClick}>{buttonText}</button>
       )}
       {isDropdownVisible && (
-        <div>
+        <form>
           <select onChange={e => setSelectedItem(e.target.value)}>
             <option value="">Select an item</option>
             {collections.map(c => (
@@ -49,8 +54,8 @@ export default function AddToCollectionButton({ nodeName }) {
               </option>
             ))}
           </select>
-          <button onClick={handleAddClick}>Add</button>
-        </div>
+          <button className="add_button" type="button" onClick={handleAddClick}>Add</button>
+        </form>
       )}
     </div>
   );
