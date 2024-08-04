@@ -28,6 +28,7 @@ export default function AddToCollectionButton({ nodeName }) {
     if (selectedItem) {
       djClient
         .addNodeToCollection(nodeName, selectedItem)
+        .then(() => setDropdownVisible(false))
         .catch(error => {
           console.error('Error fetching collections:', error);
         });
@@ -36,7 +37,7 @@ export default function AddToCollectionButton({ nodeName }) {
   return (
     <div className="badge">
       {!isDropdownVisible && (
-        <button onClick={handleButtonClick}>Collection</button>
+        <button className="menu-button" onClick={handleButtonClick}>+ Collection</button>
       )}
       {isDropdownVisible && (
         <div>

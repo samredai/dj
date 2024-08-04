@@ -1,12 +1,13 @@
 import DJClientContext from '../providers/djclient';
 import * as React from 'react';
 import DeleteIcon from '../icons/DeleteIcon';
+import RemoveIcon from '../icons/RemoveIcon';
 import EditIcon from '../icons/EditIcon';
 import { Form, Formik } from 'formik';
 import { useContext } from 'react';
 import { displayMessageAfterSubmit } from '../../utils/form';
 
-export default function NodeListActions({ nodeName }) {
+export default function NodeListActions({ nodeName, collectionName, onRemove }) {
   const [editButton, setEditButton] = React.useState(<EditIcon />);
   const [deleteButton, setDeleteButton] = React.useState(<DeleteIcon />);
 
@@ -64,6 +65,16 @@ export default function NodeListActions({ nodeName }) {
           );
         }}
       </Formik>
+      {collectionName ? (
+        <RemoveIcon
+          nodeName={nodeName}
+          collectionName={collectionName}
+          onRemove={onRemove}
+          djClient={djClient}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

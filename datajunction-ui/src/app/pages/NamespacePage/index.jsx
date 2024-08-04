@@ -13,7 +13,7 @@ import 'styles/sorted-table.css';
 
 export function NamespacePage() {
   const [collectionData, setCollectionData] = useState(null)
-
+  const [numNodes, setNumNodes] = useState(null)
   const ASC = 'ascending';
   const DESC = 'descending';
 
@@ -100,18 +100,19 @@ export function NamespacePage() {
       setNamespaceHierarchy(hierarchy);
     };
     fetchData().catch(console.error);
-  }, [djClient, djClient.namespaces]);
+  }, [djClient, djClient.namespaces, numNodes]);
 
   useEffect(() => {
     if (collection) {
       const fetchData = async () => {
         const collectionData = await djClient.collection(collection);
         setCollectionData(collectionData);
+        setNumNodes(collectionData.nodes.length)
       };
       fetchData().catch(console.error);
     }
 
-  }, [collection]);
+  }, [collection, numNodes]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -132,6 +133,12 @@ export function NamespacePage() {
     };
     fetchData().catch(console.error);
   }, [djClient, namespace, namespaceHierarchy]);
+
+  const onRemove = (response) => {
+    if (response.status >= 200 && response.status < 300) {
+      setNumNodes(numNodes - 1)
+    }
+  }
 
   const nodesList = sortedNodes.map(node => (
     <tr>
@@ -165,7 +172,7 @@ export function NamespacePage() {
         </span>
       </td>
       <td>
-        <NodeListActions nodeName={node?.name} />
+        <NodeListActions nodeName={node?.name} collectionName={collection} onRemove={onRemove} />
       </td>
     </tr>
   ));
@@ -175,7 +182,8 @@ export function NamespacePage() {
         <CollectionBanner
           name={collectionData.name}
           description={collectionData.description}
-          numNodes={collectionData.nodes.length}
+          numNodes={numNodes}
+          setNumNodes={setNumNodes}
         />
       ) : (
         <></>

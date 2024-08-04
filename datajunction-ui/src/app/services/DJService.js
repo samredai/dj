@@ -95,6 +95,17 @@ export const DataJunctionAPI = {
     }).catch(e => console.log(`Error adding node to collection: ${e}`));
   },
 
+  removeNodeFromCollection: async function (nodeName, collectionName) {
+    return await await fetch(`${DJ_URL}/collections/${collectionName}/remove`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([nodeName]),
+    }).catch(e => console.log(`Error removing node from collection: ${e}`));
+  },
+
   nodesWithType: async function (nodeType) {
     return await (
       await fetch(`${DJ_URL}/nodes/?node_type=${nodeType}`, {
