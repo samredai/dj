@@ -24,9 +24,9 @@ export default function CollectionBanner({ name, description, numNodes, setNumNo
     if (!selectedNode) return;
     try {
       await djClient.addNodeToCollection(selectedNode, name);
-      setButtonText('Added!');
+      setButtonText(`Added node ${selectedNode}!`);
       setNumNodes(numNodes + 1);
-      setTimeout(() => setButtonText('Add'), 500); // Reset button text after 2 seconds
+      setTimeout(() => setButtonText('Add'), 2000); // Reset button text after 2 seconds
     } catch (error) {
       console.error('Failed to add node to collection:', error);
     }

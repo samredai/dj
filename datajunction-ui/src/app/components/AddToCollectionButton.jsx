@@ -30,9 +30,9 @@ export default function AddToCollectionButton({ nodeName }) {
       djClient
         .addNodeToCollection(nodeName, selectedItem)
         .then(() => {
-            setButtonText('Added!');
+            setButtonText(`Added to ${selectedItem}!`);
             setDropdownVisible(false)
-            setTimeout(() => setButtonText('+ Collection'), 500); // Reset button text after 2 seconds
+            setTimeout(() => setButtonText('+ Collection'), 2000); // Reset button text after 2 seconds
         })
         .catch(error => {
           console.error('Error fetching collections:', error);
