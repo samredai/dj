@@ -10,11 +10,13 @@ export default function CreateCollectionCard() {
     djClient
       .createCollection(name, description)
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          window.location.href = `/?collection=${name}`;
-        } else {
+        if (response.status >= 300) {
           alert('An error occurred while trying to create the collection.');
         }
+        return response.json();
+      })
+      .then(data => {
+        window.location.href = `/?collection=${data.id}`;
       })
       .catch(error => {
         console.error('Error creating collection:', error);

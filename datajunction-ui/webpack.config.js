@@ -32,7 +32,9 @@ module.exports = {
       disableDotRule: true,
     },
     hot: true,
-    contentBase: path.join(__dirname, 'dist'),
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
   },
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.scss'],

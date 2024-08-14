@@ -1,4 +1,3 @@
-import { useParams } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import CollectionCard from '../../components/CollectionCard';
 import CreateCollectionCard from '../../components/CreateCollectionCard';
@@ -38,7 +37,7 @@ export function CollectionsPage() {
           <div className="cards">
             {showCreateCollection ? <CreateCollectionCard /> : <></>}
             {collections.map(c => (
-              <CollectionCard name={c.name} description={c.description} />
+              <CollectionCard collectionId={c.id} name={c.name} description={c.description} />
             ))}
           </div>
         </div>

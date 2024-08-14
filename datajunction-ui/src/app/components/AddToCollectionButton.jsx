@@ -1,11 +1,13 @@
 import { useContext, useState, useEffect } from 'react';
 import DJClientContext from '../providers/djclient';
+import { displayMessageAfterSubmit } from '../../utils/form';
 
 export default function AddToCollectionButton({ nodeName }) {
+  const [status, setStatus] = useState();
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [collections, setCollections] = useState([]);
-  const [buttonText, setButtonText] = useState('+ Collection');
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [showAddButton, setShowAddButton] = useState(true);
+  const [selectedCollectionID, setSelectedCollectionID] = useState(null);
   const djClient = useContext(DJClientContext).DataJunctionAPI;
 
   useEffect(() => {
@@ -26,13 +28,24 @@ export default function AddToCollectionButton({ nodeName }) {
   };
 
   const handleAddClick = () => {
-    if (selectedItem) {
+    if (selectedCollectionID) {
       djClient
-        .addNodeToCollection(nodeName, selectedItem)
+        .addNodeToCollection(nodeName, selectedCollectionID)
         .then(() => {
-            setButtonText(`Added to ${selectedItem}!`);
-            setDropdownVisible(false)
-            setTimeout(() => setButtonText('+ Collection'), 2000); // Reset button text after 2 seconds
+          setShowAddButton(false);
+          setDropdownVisible(false);
+          setStatus({
+            success: (
+              <>
+                Node successfully added to {' '}
+                <a href={`/?collection=${selectedCollectionID}`}>Collection {selectedCollectionID}</a>
+              </>
+            ),
+          });
+          setTimeout(() => {
+            setStatus(null);
+            setShowAddButton(true);
+          }, 2000); // Reset button text after 2 seconds
         })
         .catch(error => {
           console.error('Error fetching collections:', error);
@@ -41,22 +54,29 @@ export default function AddToCollectionButton({ nodeName }) {
   };
   return (
     <div className="badge">
-      {!isDropdownVisible && (
-        <button className="menu-button" onClick={handleButtonClick}>{buttonText}</button>
+      {!isDropdownVisible && showAddButton ? (
+        <button className="menu-button" onClick={handleButtonClick}>
+          + Collection
+        </button>
+      ) : (
+        <></>
       )}
       {isDropdownVisible && (
         <form>
-          <select onChange={e => setSelectedItem(e.target.value)}>
+          <select onChange={e => setSelectedCollectionID(e.target.value)}>
             <option value="">Select an item</option>
             {collections.map(c => (
-              <option key={c.id} value={c.name}>
+              <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
           </select>
-          <button className="add_button" type="button" onClick={handleAddClick}>Add</button>
+          <button className="add_button" type="button" onClick={handleAddClick}>
+            Add
+          </button>
         </form>
       )}
+      {displayMessageAfterSubmit(status)}
     </div>
   );
 }

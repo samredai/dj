@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.operators import is_, or_
 
 from datajunction_server.database.base import Base
+from datajunction_server.database.collection import Collection
 from datajunction_server.database.node import Node, NodeRevision
 from datajunction_server.errors import DJDoesNotExistException
 from datajunction_server.models.node import NodeMinimumDetail
@@ -53,7 +54,7 @@ class NodeNamespace(Base):  # pylint: disable=too-few-public-methods
             )
         )
         if collection is not None:
-            statement = statement.where(Node.collections.any(name=collection))
+            statement = statement.where(Node.collections.any(id=collection))
         
         statement = statement.group_by(NodeNamespace.namespace)
         result = await session.execute(statement)
@@ -86,6 +87,7 @@ class NodeNamespace(Base):  # pylint: disable=too-few-public-methods
         session: AsyncSession,
         namespace: str,
         node_type: NodeType = None,
+        collection_id: int = None,
         include_deactivated: bool = False,
     ) -> List["NodeMinimumDetail"]:
         """
@@ -113,6 +115,8 @@ class NodeNamespace(Base):  # pylint: disable=too-few-public-methods
             Node.name == NodeRevision.name,
             Node.type == node_type if node_type else True,
         )
+        if collection_id:
+            list_nodes_query = list_nodes_query.filter(Node.collections.any(Collection.id == collection_id))
         if include_deactivated is False:
             list_nodes_query = list_nodes_query.where(is_(Node.deactivated_at, None))
 

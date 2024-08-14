@@ -1,7 +1,7 @@
 
-export default function RemoveIcon({ nodeName, collectionName, onRemove, djClient }) {
+export default function RemoveIcon({ nodeName, collectionId, onRemove, djClient }) {
     const handleClick = () => {
-      djClient.removeNodeFromCollection(nodeName, collectionName)
+      djClient.removeNodeFromCollection(nodeName, collectionId)
         .then(response => {
           // Handle successful response
           if (onRemove) {
@@ -10,7 +10,7 @@ export default function RemoveIcon({ nodeName, collectionName, onRemove, djClien
         })
         .catch(error => {
           // Handle error
-          console.error("Error removing node from collection:", error);
+          console.error(`Error removing node from collection ${collectionId}:`, error);
         });
     };
   

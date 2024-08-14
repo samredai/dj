@@ -102,7 +102,7 @@ async def create_node_namespace(
 )
 async def list_namespaces(
     session: AsyncSession = Depends(get_session),
-    collection: Optional[str] = None,
+    collection: Optional[int] = None,
     current_user: User = Depends(get_and_update_current_user),
     validate_access: access.ValidateAccessFn = Depends(  # pylint: disable=W0621
         validate_access,
@@ -145,12 +145,16 @@ async def list_nodes_in_namespace(
         default=None,
         description="Filter the list of nodes to this type",
     ),
+    collection_id: Optional[int] = Query(
+        default=None,
+        description="Filter the list of nodes to a specific collection",
+    ),
     session: AsyncSession = Depends(get_session),
 ) -> List[NodeMinimumDetail]:
     """
     List node names in namespace, filterable to a given type if desired.
     """
-    return await NodeNamespace.list_nodes(session, namespace, type_)
+    return await NodeNamespace.list_nodes(session, namespace, type_, collection_id)
 
 
 @router.delete("/namespaces/{namespace}/", status_code=HTTPStatus.OK)

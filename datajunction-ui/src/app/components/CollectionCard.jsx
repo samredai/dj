@@ -1,10 +1,10 @@
 import { useContext } from 'react';
 import DJClientContext from '../providers/djclient';
 
-export default function CollectionCard({ name, description }) {
+export default function CollectionCard({ collectionId, name, description }) {
   const djClient = useContext(DJClientContext).DataJunctionAPI;
   const handleNavigation = () => {
-    window.location.href = `/?collection=${name}`;
+    window.location.href = `/?collection=${collectionId}`;
   };
   const handleDelete = () => {
     const confirmDelete = window.confirm(
@@ -12,7 +12,7 @@ export default function CollectionCard({ name, description }) {
     );
     if (confirmDelete) {
       djClient
-        .deleteCollection(name)
+        .deleteCollection(collectionId)
         .then(response => {
           alert('Collection successfully deleted.');
           window.location.reload(); // Reload the page or navigate to another page

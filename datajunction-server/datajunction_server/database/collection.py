@@ -63,6 +63,25 @@ class Collection(Base):  # pylint: disable=too-few-public-methods
                 http_status_code=404,
             )
         return collection
+    
+    @classmethod
+    async def get_by_id(
+        cls,
+        session: AsyncSession,
+        collection_id: int,
+        raise_if_not_exists: bool = False,
+    ) -> Optional["Collection"]:
+        """
+        Get a collection by name
+        """
+        statement = select(Collection).where(Collection.id == collection_id)
+        collection = (await session.execute(statement)).scalar()
+        if not collection and raise_if_not_exists:
+            raise DJDoesNotExistException(
+                message=f"Collection with ID `{collection_id}` does not exist.",
+                http_status_code=404,
+            )
+        return collection
 
 
 class CollectionNodes(Base):  # type: ignore  # pylint: disable=too-few-public-methods

@@ -56,16 +56,16 @@ async def create_a_collection(
     return CollectionInfo.from_orm(collection)
 
 
-@router.delete("/collections/{name}", status_code=HTTPStatus.NO_CONTENT)
+@router.delete("/collections/{collection_id}", status_code=HTTPStatus.NO_CONTENT)
 async def delete_a_collection(
-    name: str,
+    collection_id: int,
     *,
     session: AsyncSession = Depends(get_session),
 ):
     """
     Delete a collection
     """
-    collection = await Collection.get_by_name(session, name)
+    collection = await Collection.get_by_id(session, collection_id)
     await session.delete(collection)
     await session.commit()
     return Response(status_code=HTTPStatus.NO_CONTENT)
@@ -85,30 +85,30 @@ async def list_collections(
     return collections.scalars().all()
 
 
-@router.get("/collections/{name}")
+@router.get("/collections/{collection_id}")
 async def get_collection(
-    name: str,
+    collection_id: int,
     *,
     session: AsyncSession = Depends(get_session),
 ):
     """
     Get a collection and its nodes
     """
-    collection = await Collection.get_by_name(
+    collection = await Collection.get_by_id(
         session,
-        name=name,
+        collection_id=collection_id,
         raise_if_not_exists=True,
     )
     return collection
 
 
 @router.post(
-    "/collections/{name}/nodes/",
+    "/collections/{collection_id}/nodes/",
     status_code=HTTPStatus.NO_CONTENT,
     name="Add Nodes to a Collection",
 )
 async def add_nodes_to_collection(
-    name: str,
+    collection_id: int,
     data: List[str],
     *,
     session: AsyncSession = Depends(get_session),
@@ -116,7 +116,7 @@ async def add_nodes_to_collection(
     """
     Add one or more nodes to a collection
     """
-    collection = await Collection.get_by_name(session, name, raise_if_not_exists=True)
+    collection = await Collection.get_by_id(session, collection_id, raise_if_not_exists=True)
     nodes = await Node.get_by_names(session=session, names=data)
     if not nodes:
         raise HTTPException(
@@ -131,12 +131,12 @@ async def add_nodes_to_collection(
 
 
 @router.post(
-    "/collections/{name}/remove/",
+    "/collections/{collection_id}/remove/",
     status_code=HTTPStatus.NO_CONTENT,
     name="Delete Nodes from a Collection",
 )
 async def delete_nodes_from_collection(
-    name: str,
+    collection_id: int,
     data: List[str],
     *,
     session: AsyncSession = Depends(get_session),
@@ -144,7 +144,7 @@ async def delete_nodes_from_collection(
     """
     Delete one or more nodes from a collection
     """
-    collection = await Collection.get_by_name(session, name)
+    collection = await Collection.get_by_id(session, collection_id)
     nodes = await Node.get_by_names(session=session, names=data)
     for node in nodes:
         if node in collection.nodes:  # type: ignore

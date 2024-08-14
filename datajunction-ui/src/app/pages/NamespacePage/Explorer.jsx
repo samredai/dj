@@ -49,6 +49,7 @@ const Explorer = ({ item = [], current, collection }) => {
       {items.children
         ? items.children.map((item, index) => (
             <div
+              key={item}
               style={{
                 paddingLeft: '1.4rem',
                 marginLeft: '1rem',

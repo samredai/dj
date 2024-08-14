@@ -38,6 +38,7 @@ class TestCollections:
         data = response.json()
         assert data == [
             {
+                "id": 1,
                 "name": "Accounting",
                 "description": "This is a collection that contains accounting related nodes",
             },
@@ -72,10 +73,11 @@ class TestCollections:
             },
         )
         assert response.status_code == 201
-
+        collection_data = response.json()
+        
         # Add a node to a collection
         response = await module__client_with_account_revenue.post(
-            "/collections/Revenue%20Project/nodes/",
+            f"/collections/{collection_data['id']}/nodes/",
             json=["default.payment_type", "default.revenue"],
         )
         assert response.status_code == 204
@@ -97,10 +99,11 @@ class TestCollections:
             },
         )
         assert response.status_code == 201
-
+        collection_data = response.json()
+        
         # Add a node to a collection
         response = await module__client_with_account_revenue.post(
-            "/collections/My%20Collection/nodes/",
+            f"/collections/{collection_data['id']}/nodes/",
             json=["foo.bar", "baz.qux"],
         )
         assert response.status_code == 404
@@ -121,26 +124,26 @@ class TestCollections:
                 "description": "A collection to test adding and removing a node",
             },
         )
-        data = response.json()
         assert response.status_code == 201
+        collection_data = response.json()
 
         # Add a node to a collection
         response = await module__client_with_account_revenue.post(
-            "/collections/add_then_remove/nodes/",
+            f"/collections/{collection_data['id']}/nodes/",
             json=["default.payment_type"],
         )
         assert response.status_code == 204
 
         # Remove the node from the collection
         response = await module__client_with_account_revenue.post(
-            "/collections/add_then_remove/remove/",
+            f"/collections/{collection_data['id']}/remove/",
             json=["default.payment_type", "default.revenue"],
         )
         assert response.status_code == 204
 
         # Confirm node no longer found in collection
         response = await module__client_with_account_revenue.get(
-            "/collections/add_then_remove",
+            f"/collections/{collection_data['id']}",
         )
         data = response.json()
         for node in data["nodes"]:
@@ -163,10 +166,11 @@ class TestCollections:
             },
         )
         assert response.status_code == 201
-
+        collection_data = response.json()
+        
         # Remove the node from the collection
         response = await module__client_with_account_revenue.post(
-            "/collections/Removing%20Nodes/remove/",
+            f"/collections/{collection_data['id']}/remove/",
             json=["foo.bar", "baz.qux"],
         )
         assert response.status_code == 204
@@ -188,10 +192,11 @@ class TestCollections:
             },
         )
         assert response.status_code == 201
-
+        collection_data = response.json()
+        
         # Remove the collection
         response = await module__client_with_account_revenue.delete(
-            "/collections/DeleteMe",
+            f"/collections/{collection_data['id']}",
         )
         assert response.status_code == 204
 

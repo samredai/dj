@@ -102,26 +102,26 @@ export const DataJunctionAPI = {
     ).json();
   },
 
-  addNodeToCollection: async function (nodeName, collectionName) {
-    return await await fetch(`${DJ_URL}/collections/${collectionName}/nodes`, {
+  addNodeToCollection: async function (nodeName, collectionId) {
+    return await await fetch(`${DJ_URL}/collections/${collectionId}/nodes`, {
       method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify([nodeName]),
-    }).catch(e => console.log(`Error adding node to collection: ${e}`));
+    }).catch(e => console.log(`Error adding node to collection ${collectionId}: ${e}`));
   },
 
-  removeNodeFromCollection: async function (nodeName, collectionName) {
-    return await await fetch(`${DJ_URL}/collections/${collectionName}/remove`, {
+  removeNodeFromCollection: async function (nodeName, collectionId) {
+    return await await fetch(`${DJ_URL}/collections/${collectionId}/remove`, {
       method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify([nodeName]),
-    }).catch(e => console.log(`Error removing node from collection: ${e}`));
+    }).catch(e => console.log(`Error removing node from collection ${collectionId}: ${e}`));
   },
 
   nodesWithType: async function (nodeType) {
@@ -410,9 +410,10 @@ export const DataJunctionAPI = {
     ).json();
   },
 
-  namespace: async function (nmspce) {
+  namespace: async function (nmspce, queryParams = {}) {
+    const queryString = buildQueryParams(queryParams);
     return await (
-      await fetch(`${DJ_URL}/namespaces/${nmspce}/`, {
+      await fetch(`${DJ_URL}/namespaces/${nmspce}/${queryString}`, {
         credentials: 'include',
       })
     ).json();

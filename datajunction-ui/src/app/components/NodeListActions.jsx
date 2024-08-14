@@ -7,7 +7,7 @@ import { Form, Formik } from 'formik';
 import { useContext } from 'react';
 import { displayMessageAfterSubmit } from '../../utils/form';
 
-export default function NodeListActions({ nodeName, collectionName, onRemove }) {
+export default function NodeListActions({ nodeName, collectionId, onRemove }) {
   const [editButton, setEditButton] = React.useState(<EditIcon />);
   const [deleteButton, setDeleteButton] = React.useState(<DeleteIcon />);
 
@@ -65,10 +65,10 @@ export default function NodeListActions({ nodeName, collectionName, onRemove }) 
           );
         }}
       </Formik>
-      {collectionName ? (
+      {collectionId ? (
         <RemoveIcon
           nodeName={nodeName}
-          collectionName={collectionName}
+          collectionId={collectionId}
           onRemove={onRemove}
           djClient={djClient}
         />

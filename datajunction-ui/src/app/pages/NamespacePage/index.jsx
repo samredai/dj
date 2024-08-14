@@ -12,8 +12,8 @@ import 'styles/node-list.css';
 import 'styles/sorted-table.css';
 
 export function NamespacePage() {
-  const [collectionData, setCollectionData] = useState(null)
-  const [numNodes, setNumNodes] = useState(null)
+  const [collectionData, setCollectionData] = useState(null);
+  const [numNodes, setNumNodes] = useState(null);
   const ASC = 'ascending';
   const DESC = 'descending';
 
@@ -27,7 +27,6 @@ export function NamespacePage() {
     namespace: namespace,
     nodes: [],
   });
-
   const [namespaceHierarchy, setNamespaceHierarchy] = useState([]);
 
   const [sortConfig, setSortConfig] = useState({
@@ -107,11 +106,10 @@ export function NamespacePage() {
       const fetchData = async () => {
         const collectionData = await djClient.collection(collection);
         setCollectionData(collectionData);
-        setNumNodes(collectionData.nodes.length)
+        setNumNodes(collectionData.nodes.length);
       };
       fetchData().catch(console.error);
     }
-
   }, [collection, numNodes]);
 
   useEffect(() => {
@@ -119,29 +117,23 @@ export function NamespacePage() {
       if (namespace === undefined && namespaceHierarchy !== undefined) {
         namespace = namespaceHierarchy[0].namespace;
       }
-      const nodes = await djClient.namespace(namespace);
-      let foundNodes = await Promise.all(nodes);
-      if (collectionData) {
-        foundNodes = foundNodes.filter(node => 
-          collectionData.nodes.some(collectionNode => node.name === collectionNode.name)
-        );
-      }
+      const nodes = await djClient.namespace(namespace, {collection_id: collection});
       setState({
         namespace: namespace,
-        nodes: foundNodes,
+        nodes: nodes,
       });
     };
-    fetchData().catch(console.error);
+    fetchData()
+      .catch(console.error);
   }, [djClient, namespace, namespaceHierarchy]);
 
-  const onRemove = (response) => {
+  const onRemove = response => {
     if (response.status >= 200 && response.status < 300) {
-      setNumNodes(numNodes - 1)
+      setNumNodes(numNodes - 1);
     }
-  }
-
+  };
   const nodesList = sortedNodes.map(node => (
-    <tr>
+    <tr key={node.name}>
       <td>
         <a href={'/nodes/' + node.name} className="link-table">
           {node.name}
@@ -172,7 +164,11 @@ export function NamespacePage() {
         </span>
       </td>
       <td>
-        <NodeListActions nodeName={node?.name} collectionName={collection} onRemove={onRemove} />
+        <NodeListActions
+          nodeName={node?.name}
+          collectionId={collection}
+          onRemove={onRemove}
+        />
       </td>
     </tr>
   ));
@@ -180,6 +176,8 @@ export function NamespacePage() {
     <div className="mid">
       {collectionData ? (
         <CollectionBanner
+          key={collectionData.id}
+          collectionId={collectionData.id}
           name={collectionData.name}
           description={collectionData.description}
           numNodes={numNodes}
@@ -209,6 +207,7 @@ export function NamespacePage() {
               {namespaceHierarchy
                 ? namespaceHierarchy.map(child => (
                     <Explorer
+                      key={child.path}
                       item={child}
                       current={state.namespace}
                       defaultExpand={true}
@@ -218,10 +217,10 @@ export function NamespacePage() {
             </div>
             <table className="card-table table">
               <thead>
-                <tr>
+                <tr key={'header'}>
                   {fields.map(field => {
                     return (
-                      <th>
+                      <th key={field}>
                         <button
                           type="button"
                           onClick={() => requestSort(field)}
