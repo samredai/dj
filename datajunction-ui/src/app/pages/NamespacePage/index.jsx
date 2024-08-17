@@ -114,14 +114,23 @@ export function NamespacePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (namespace === undefined && namespaceHierarchy !== undefined) {
-        namespace = namespaceHierarchy[0].namespace;
+      try {
+        if (namespace === undefined && namespaceHierarchy !== undefined) {
+          namespace = namespaceHierarchy[0].namespace;
+        }
+        const nodes = await djClient.namespace(namespace, {collection_id: collection});
+        setState({
+          namespace: namespace,
+          nodes: nodes,
+        });
+      } catch (error) {
+        console.error(`Failed to fetch nodes in namespace: ${error.message}`, error);
+        setState({
+          namespace: namespace,
+          nodes: [],
+          error: error.message,
+        });
       }
-      const nodes = await djClient.namespace(namespace, {collection_id: collection});
-      setState({
-        namespace: namespace,
-        nodes: nodes,
-      });
     };
     fetchData()
       .catch(console.error);

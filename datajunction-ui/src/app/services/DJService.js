@@ -412,11 +412,19 @@ export const DataJunctionAPI = {
 
   namespace: async function (nmspce, queryParams = {}) {
     const queryString = buildQueryParams(queryParams);
-    return await (
-      await fetch(`${DJ_URL}/namespaces/${nmspce}/${queryString}`, {
-        credentials: 'include',
-      })
-    ).json();
+    const response = await fetch(`${DJ_URL}/namespaces/${nmspce}/${queryString}`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const error = new Error(`Error retrieving nodes in namespace ${nmspce} ${response.status}: ${errorData.message || response.statusText}`);
+      error.status = response.status;
+      error.data = errorData;
+      throw error;
+    }
+
+    return await response.json();
   },
 
   namespaces: async function (queryParams = {}) {
