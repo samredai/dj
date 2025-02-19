@@ -1,7 +1,9 @@
 package io.datajunction.models.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 public class Metric {
     private String name;
     @JsonProperty("display_name")
@@ -20,29 +22,5 @@ public class Metric {
         this.mode = mode;
         this.query = query;
         this.updateIfExists = updateIfExists;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getMode() {
-        return mode;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public boolean isUpdateIfExists() {
-        return updateIfExists;
     }
 }

@@ -1,9 +1,10 @@
 package io.datajunction.models.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import lombok.Data;
 import java.util.List;
 
+@Data
 public class Dimension {
     private String name;
     @JsonProperty("display_name")
@@ -27,37 +28,5 @@ public class Dimension {
         this.tags = tags;
         this.query = query;
         this.updateIfExists = updateIfExists;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getMode() {
-        return mode;
-    }
-
-    public List<String> getPrimaryKey() {
-        return primaryKey;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public boolean isUpdateIfExists() {
-        return updateIfExists;
     }
 }

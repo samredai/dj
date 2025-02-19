@@ -1,9 +1,10 @@
 package io.datajunction.models.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import lombok.Data;
 import java.util.List;
 
+@Data
 public class Source {
     private String name;
     private String catalog;
@@ -32,45 +33,5 @@ public class Source {
         this.primaryKey = primaryKey;
         this.mode = mode;
         this.updateIfExists = updateIfExists;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getCatalog() {
-        return catalog;
-    }
-
-    public String getSchema() {
-        return schema_;
-    }
-
-    public String getTable() {
-        return table;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public List<Column> getColumns() {
-        return columns;
-    }
-
-    public List<String> getPrimaryKey() {
-        return primaryKey;
-    }
-
-    public String getMode() {
-        return mode;
-    }
-
-    public boolean isUpdateIfExists() {
-        return updateIfExists;
     }
 }
