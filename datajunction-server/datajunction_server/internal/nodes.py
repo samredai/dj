@@ -1564,9 +1564,10 @@ async def derive_sql_column(
     )
 
 
-async def get_cube_revision_metadata(session: AsyncSession, name: str):
+async def _build_cube_revision_statement(name: Optional[str] = None):
     """
-    Returns cube revision metadata for cube named `name`.
+    Builds the base SQLAlchemy statement for fetching cube revision metadata.
+    This function returns a SQLAlchemy Select object, not the results.
     """
     statement = (
         select(NodeRevision)
@@ -1576,7 +1577,6 @@ async def get_cube_revision_metadata(session: AsyncSession, name: str):
             (NodeRevision.name == Node.name)
             & (NodeRevision.version == Node.current_version),
         )
-        .where(Node.name == name)
         .options(
             selectinload(NodeRevision.columns),
             selectinload(NodeRevision.availability),
@@ -1591,7 +1591,22 @@ async def get_cube_revision_metadata(session: AsyncSession, name: str):
             selectinload(NodeRevision.node).options(selectinload(Node.tags)),
         )
     )
+    if name:
+        statement = statement.where(Node.name == name)
+
+    return statement
+
+
+async def get_single_cube_revision_metadata(
+    session: AsyncSession,
+    name: str,
+) -> CubeRevisionMetadata:
+    """
+    Returns cube revision metadata for a single cube named `name`.
+    """
+    statement = await _build_cube_revision_statement(name=name)
     result = (await session.execute(statement)).unique().first()
+
     if not result:
         raise DJNodeNotFound(  # pragma: no cover
             message=f"A cube node with name `{name}` does not exist.",
@@ -1612,6 +1627,42 @@ async def get_cube_revision_metadata(session: AsyncSession, name: str):
         await derive_sql_column(element) for element in cube_metadata.cube_elements
     ]
     return cube_metadata
+
+
+async def get_all_cube_revisions_metadata(
+    session: AsyncSession,
+    include_only_available: bool = False,
+) -> List[CubeRevisionMetadata]:
+    """
+    Returns cube revision metadata for the latest version of all cubes.
+    Optionally includes only cubes with availability.
+    """
+    statement = await _build_cube_revision_statement()
+
+    if include_only_available:
+        statement = statement.where(
+            NodeRevision.availability.has(),
+        )
+
+    result = await session.execute(statement)
+    cubes = result.unique().scalars().all()
+
+    all_cube_metadata: List[CubeRevisionMetadata] = []
+    for cube in cubes:
+        # Preserve the ordering of elements
+        element_ordering = {col.name: col.order for col in cube.columns}
+        cube.cube_elements = sorted(
+            cube.cube_elements,
+            key=lambda elem: element_ordering.get(from_amenable_name(elem.name), 0),
+        )
+        cube_metadata = CubeRevisionMetadata.from_orm(cube)
+        cube_metadata.tags = cube.node.tags
+        cube_metadata.sql_columns = [
+            await derive_sql_column(element) for element in cube_metadata.cube_elements
+        ]
+        all_cube_metadata.append(cube_metadata)
+
+    return all_cube_metadata
 
 
 async def upsert_complex_dimension_link(
