@@ -112,7 +112,7 @@ class Settings(BaseSettings):  # pragma: no cover
     query_service: Optional[str] = None
 
     # Query client configuration
-    query_client: QueryClientConfig = QueryClientConfig()
+    query_client: QueryClientConfig = Field(default_factory=QueryClientConfig)
 
     # The namespace where source nodes for registered tables should exist
     source_node_namespace: Optional[str] = "source"
