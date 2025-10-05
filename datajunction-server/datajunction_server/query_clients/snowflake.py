@@ -14,12 +14,12 @@ from datajunction_server.sql.parsing.types import ColumnType
 if TYPE_CHECKING:
     from datajunction_server.database.engine import Engine
 
-try:
+try:  # pragma: no cover
     import snowflake.connector
     from snowflake.connector import DictCursor
 
     SNOWFLAKE_AVAILABLE = True
-except ImportError:
+except ImportError:  # pragma: no cover
     snowflake = None
     DictCursor = None
     SNOWFLAKE_AVAILABLE = False

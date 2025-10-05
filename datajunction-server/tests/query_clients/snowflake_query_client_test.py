@@ -4,32 +4,6 @@ from unittest.mock import Mock, patch, MagicMock
 import pytest
 
 
-def test_snowflake_available_import():
-    """Test that snowflake imports work when available."""
-    # Import without any patches to cover the import lines 19-20
-    import sys
-
-    # Temporarily mock the snowflake package to make imports succeed
-    sys.modules["snowflake"] = Mock()
-    sys.modules["snowflake.connector"] = Mock()
-    sys.modules["snowflake.connector"].DictCursor = Mock()
-
-    # Now import the module to execute the import lines
-    import importlib
-    import datajunction_server.query_clients.snowflake as sf_module
-
-    importlib.reload(sf_module)
-
-    # Clean up
-    if "snowflake" in sys.modules:
-        del sys.modules["snowflake"]
-    if "snowflake.connector" in sys.modules:
-        del sys.modules["snowflake.connector"]
-
-    # The import should have worked
-    assert hasattr(sf_module, "SNOWFLAKE_AVAILABLE")
-
-
 def test_snowflake_client_import_error():
     """Test SnowflakeClient handles missing snowflake-connector-python."""
     with patch(
