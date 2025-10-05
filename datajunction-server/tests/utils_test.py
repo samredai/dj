@@ -182,8 +182,7 @@ def test_get_query_service_client(mocker: MockerFixture, settings: Settings) -> 
     Test ``get_query_service_client``.
     """
     settings.query_service = "http://query_service:8001"
-    mocker.patch("datajunction_server.utils.get_settings", return_value=settings)
-    query_service_client = get_query_service_client()
+    query_service_client = get_query_service_client(settings=settings)
     assert query_service_client.uri == "http://query_service:8001"  # type: ignore
 
 
@@ -351,7 +350,6 @@ def test_get_query_service_client_with_configured_client(
         connection={"account": "test_account", "user": "test_user"},
     )
     settings.query_service = None
-    mocker.patch("datajunction_server.utils.get_settings", return_value=settings)
 
     # Mock the SnowflakeClient import to avoid dependency issues
     mock_snowflake_client = mocker.MagicMock()
@@ -360,7 +358,7 @@ def test_get_query_service_client_with_configured_client(
         mock_snowflake_client,
     )
 
-    client = get_query_service_client()
+    client = get_query_service_client(settings=settings)
     assert client is not None
     mock_snowflake_client.assert_called_once_with(
         account="test_account",
@@ -379,9 +377,8 @@ def test_get_query_service_client_returns_none(
     from datajunction_server.config import QueryClientConfig
 
     settings.query_client = QueryClientConfig(type="http", connection={})
-    mocker.patch("datajunction_server.utils.get_settings", return_value=settings)
 
-    client = get_query_service_client()
+    client = get_query_service_client(settings=settings)
     assert client is None
 
 
@@ -471,7 +468,6 @@ def test_get_legacy_query_service_client(
     Test get_legacy_query_service_client returns QueryServiceClient.
     """
     settings.query_service = "http://query_service:8001"
-    mocker.patch("datajunction_server.utils.get_settings", return_value=settings)
 
     # Mock QueryServiceClient to avoid import issues
     mock_query_service_client_cls = mocker.MagicMock()
@@ -482,6 +478,6 @@ def test_get_legacy_query_service_client(
         mock_query_service_client_cls,
     )
 
-    client = get_legacy_query_service_client()
+    client = get_legacy_query_service_client(settings=settings)
     mock_query_service_client_cls.assert_called_once_with("http://query_service:8001")
     assert client == mock_query_service_client_instance

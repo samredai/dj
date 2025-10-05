@@ -292,6 +292,7 @@ async def execute_with_retry(
 
 
 def get_query_service_client(
+    settings: Settings = Depends(get_settings),
     request: Request = None,
 ):
     """
@@ -300,8 +301,6 @@ def get_query_service_client(
     This function supports both HTTP query service configuration (for production scale)
     and direct client configurations for various data warehouse vendors (for smaller scale/demo).
     """
-    settings = get_settings()
-
     # Check for new query client configuration first
     if settings.query_client.type != "http" or settings.query_client.connection:
         return _create_configured_query_client(settings.query_client)
@@ -368,6 +367,7 @@ def _create_configured_query_client(
 
 
 def get_legacy_query_service_client(
+    settings: Settings = Depends(get_settings),
     request: Request = None,
 ) -> Optional[QueryServiceClient]:
     """
@@ -377,7 +377,6 @@ def get_legacy_query_service_client(
     """
     from datajunction_server.service_clients import QueryServiceClient
 
-    settings = get_settings()
     if not settings.query_service:  # pragma: no cover
         return None
     return QueryServiceClient(settings.query_service)
