@@ -469,12 +469,11 @@ def test_get_legacy_query_service_client(
     """
     settings.query_service = "http://query_service:8001"
 
-    # Mock QueryServiceClient to avoid import issues
     mock_query_service_client_cls = mocker.MagicMock()
     mock_query_service_client_instance = mocker.MagicMock()
     mock_query_service_client_cls.return_value = mock_query_service_client_instance
     mocker.patch(
-        "datajunction_server.utils.QueryServiceClient",
+        "datajunction_server.service_clients.QueryServiceClient",
         mock_query_service_client_cls,
     )
 
