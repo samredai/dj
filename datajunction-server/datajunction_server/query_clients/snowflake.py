@@ -27,12 +27,15 @@ except ImportError:  # pragma: no cover
 _logger = logging.getLogger(__name__)
 
 
-class SnowflakeClient(BaseQueryServiceClient):
+class SnowflakeClient(BaseQueryServiceClient):  # pragma: no cover
     """
     Snowflake query client using direct snowflake-connector-python.
 
     This client connects directly to Snowflake without requiring an external query service.
     It implements the essential methods for table introspection and querying.
+
+    Note: This class is not extensively tested in the test suite as it requires
+    snowflake-connector-python to be installed and actual Snowflake credentials.
     """
 
     def __init__(

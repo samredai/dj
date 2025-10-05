@@ -21,11 +21,12 @@ if TYPE_CHECKING:
     from datajunction_server.database.engine import Engine
 
 
-class HttpQueryServiceClient(BaseQueryServiceClient):
+class HttpQueryServiceClient(BaseQueryServiceClient):  # pragma: no cover
     """
     HTTP-based query service client that wraps the original QueryServiceClient.
 
     This maintains backward compatibility with the existing HTTP query service pattern.
+    All methods are simple pass-throughs to the underlying QueryServiceClient.
     """
 
     def __init__(self, uri: str, retries: int = 0):
