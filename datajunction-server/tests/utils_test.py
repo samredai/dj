@@ -382,6 +382,20 @@ def test_get_query_service_client_returns_none(
     assert client is None
 
 
+def test_create_configured_query_client_http_success(mocker: MockerFixture) -> None:
+    """
+    Test _create_configured_query_client creates HTTP client successfully.
+    """
+    from datajunction_server.config import QueryClientConfig
+    from datajunction_server.query_clients import HttpQueryServiceClient
+
+    config = QueryClientConfig(type="http", connection={"uri": "http://test:8001"})
+
+    client = _create_configured_query_client(config)
+    assert isinstance(client, HttpQueryServiceClient)
+    assert client.uri == "http://test:8001"
+
+
 def test_create_configured_query_client_http_missing_uri(mocker: MockerFixture) -> None:
     """
     Test _create_configured_query_client raises error for HTTP client without URI.
